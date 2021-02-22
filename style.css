@@ -1,0 +1,82 @@
+* {
+    margin: 0;
+    padding: 0;
+    outline: none;
+    border: none;
+    list-style: none;
+    font-size: inherit;
+    color: inherit;
+    box-sizing: border-box;
+}
+body {
+    width: 100%;
+    min-height: 100vh;
+    padding: 5% 10%;
+    text-align: center;
+    background: #fcfcfc;
+    color: #333;
+}
+h1 {
+    font-size: 3rem;
+    margin-bottom: 2rem;
+}
+p {
+    font-size: 1.5rem;
+    margin-bottom: 1rem;
+}
+.input {
+    background-color: lightblue;
+    border: 1px solid lightblue;
+    padding: 0.5rem 1rem;
+    font-size: 1.25rem;
+    transition: border-color 0.3s ease;
+}
+.input:focus {
+    border-color: lightseagreen;
+}
+.btn {
+    padding: 0.5rem 1.5rem;
+    font-size: 1.25rem;
+    border: 1px solid lightseagreen;
+    text-transform: uppercase;
+    background-color: lightseagreen;
+    color: white;
+    cursor: pointer;
+    transition: background-color 0.3s ease, color 0.3s ease, transform 0.3s ease;
+}
+.btn:hover {
+    background-color: lightblue;
+    color: lightseagreen;
+}
+.btn:active {
+    transform: scale(0.9);
+}
+.error {
+    display: none;
+    font-size: 1rem;
+    color: #cc4d4d;
+}
+.error.active {
+    display: block;
+}
+.data-container {
+    overflow: auto;
+    padding: 2rem 1.5rem;
+    background-color: lightgrey;
+    margin-top: 3rem;
+    text-align: center;
+}
+
+table {
+    font-size: 1.25rem;
+    margin: 0 auto;
+}
+table thead {
+    background-color: lightseagreen;
+    color: white;
+}
+table td,
+table th {
+    padding: 0.5rem 1rem;
+    border: 1px solid lightseagreen;
+}

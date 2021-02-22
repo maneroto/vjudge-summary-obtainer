@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VJudge obtainer</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <h1>
+        Welcome to the VJudge contest obtainer!
+    </h1>
+    <p>
+        We are intending to facilitate the contest summary retrieval job with some scripts!
+    </p>
+    <p>
+        Just fill up the input, click the button and that's it
+    </p>
+    <input type="text" name="contest_id" class="input">
+    <button class="btn">
+        Obtain
+    </button>
+    <span class="error">Some error has occurred</span>
+    <div class="data-container">
+        <h2 class="description">
+            The obtained information will be displayed here
+        </h2>
+    </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.21.1/axios.min.js" integrity="sha512-bZS47S7sPOxkjU/4Bt0zrhEtWx0y0CRkhEp8IckzK+ltifIIE9EMIMTuT/mEzoIMewUINruDBIR/jJnbguonqQ==" crossorigin="anonymous"></script>
+    <script src="main.js"></script>
+</body>
+</html>
