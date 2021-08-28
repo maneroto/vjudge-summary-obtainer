@@ -24,6 +24,10 @@ p {
     font-size: 1.5rem;
     margin-bottom: 1rem;
 }
+.input-container {
+    display: block;
+    margin-bottom: 2rem;
+}
 .input {
     background-color: lightblue;
     border: 1px solid lightblue;

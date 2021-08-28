@@ -1,20 +1,7 @@
-// Config options
-const config = {
-    csvURL: './res/reto_semestral.csv',
-    outputName: (contestId) => `contest-${contestId}.csv`,
-};
-
-const notEmpty = (inputArray) => {
-    inputArray.foreach((input) => {
-        if (input.value == '') return false;
-    });
-    return true;
-};
-
 const showError = (errorMsg) => {
     const container = document.querySelector('.error');
     container.classList.add('active');
-    container.textContent = errorMsg;
+    container.innerHTML = errorMsg;
 };
 
 const hideError = () => {
@@ -90,49 +77,78 @@ const readFile = (file) => {
 
 const readCSV = async (file) => {
     try {
-        let data = await readFile(file);
-        data = csvToArray(data);
-        data = JSON.stringify(data);
-        return data;
+        const data = csvToArray(await readFile(file));
+        return JSON.stringify(data);
     } catch (e) {
         showError(e.message);
     }
 };
 
-const createOptionTag = (value) => {
-    const option = document.createElement('option');
-    option.value = value;
-    option.textContent = value;
-    return option;
-};
-
-const getCsv = async () => {
-    try {
-        const res = await axios.get(config.csvURL);
-        return res.data;
-    } catch (error) {
-        console.log(error);
-        showError('Internal error, csv input file is corrupted.');
+const exportToHTML = (info) => {
+    const table = document.createElement('table');
+    table.innerHTML =
+        '<thead><tr><th>Team</th><th>User</th><th>Problems Solved IDs</th></tr></thead><tbody></tbody>';
+    const body = table.querySelector('tbody');
+    for (item in info) {
+        let team = info[item][0];
+        let user = info[item][1];
+        let accepted = info[item].accepted;
+        if (!accepted) accepted = 'None';
+        body.innerHTML += `<tr><td>${team}</td><td>${user}</td><td>${accepted}</td></tr>`;
     }
+    return table;
 };
 
-const initialize = async (inputs) => {
-    console.log(await getCsv());
-    let csvInput = readCSV(config.csvURL);
-    console.log(csvInput);
+const exportToCSV = (data) => {
+    let csv = [];
+    let rows = data.querySelectorAll('table tr');
+
+    rows.forEach((row) => {
+        let cols = row.querySelectorAll('td, th');
+        cols = [...cols].map((col) => col.innerHTML);
+        csv.push(cols.join(','));
+    });
+    return csv.join('\n');
 };
 
-window.addEventListener('DOMContentLoaded', () => {
-    const form = document.querySelector('#form');
-    const inputs = {
-        contest: form.querySelector('#contest-id'),
-        teams: form.querySelector('#teams'),
-        csv: form.querySelector('#csv'),
-    };
+const downloadCSV = (csv, filename) => {
+    let file = new Blob([csv], { type: 'text/csv' });
+    let link = document.createElement('a');
 
-    form.onsubmit = (e) => {
-        e.preventDefault();
-    };
+    link.download = filename;
+    link.href = window.URL.createObjectURL(file);
+    link.click();
+};
 
-    initialize(inputs);
-});
+const showData = (data) => {
+    const container = document.querySelector('.data-container');
+    container.innerHTML = '';
+    container.appendChild(data);
+};
+
+const execute = async (contestId, teamId, csv) => {
+    const teams = await readCSV(csv);
+    let info = await getContest(contestId);
+    info = deconstructContest(info);
+    let html = exportToHTML(info);
+    showData(html);
+    let resultantCsv = exportToCSV(html);
+    downloadCSV(resultantCsv, `contest-${contestId}.csv`);
+};
+
+const setBehavior = () => {
+    const button = document.querySelector('.btn');
+    button.onclick = function () {
+        const contest = document.querySelector('.input.contest');
+        const team = document.querySelector('.input.team');
+        const csv = document.querySelector('.csv');
+        if (contest.value != '' || team.value != '') {
+            hideError();
+            execute(contest.value, team.value, csv.files[0]);
+        } else {
+            showError('You need to fill all the inputs');
+        }
+    };
+};
+
+setBehavior();
