@@ -2,13 +2,8 @@
 const config = {
     csvURL: './res/reto_semestral.csv',
     outputName: (contestId) => `contest-${contestId}.csv`,
-};
-
-const notEmpty = (inputArray) => {
-    inputArray.foreach((input) => {
-        if (input.value == '') return false;
-    });
-    return true;
+    inputs,
+    data,
 };
 
 const showError = (errorMsg) => {
@@ -108,17 +103,16 @@ const setGroupOptions = (target, groups) => {
     });
 };
 
-const initialize = async (inputs) => {
+const initialize = async () => {
     const csvFile = await getFile(config.csvURL);
-    const csvData = csvToArray(csvFile);
-    const groups = getGroups(csvData);
-    console.log(groups);
-    setGroupOptions(inputs.groups, groups);
+    config.data = csvToArray(csvFile);
+    const groups = getGroups(config.data);
+    setGroupOptions(config.inputs.groups, groups);
 };
 
 window.addEventListener('DOMContentLoaded', () => {
     const form = document.querySelector('#form');
-    const inputs = {
+    config.inputs = {
         contest: form.querySelector('#contest-id'),
         groups: form.querySelector('#groups'),
     };
@@ -127,5 +121,5 @@ window.addEventListener('DOMContentLoaded', () => {
         e.preventDefault();
     };
 
-    initialize(inputs);
+    initialize();
 });
