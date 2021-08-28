@@ -73,32 +73,6 @@ const csvToArray = (data, delimiter = ',') => {
     return arr;
 };
 
-const readFile = (file) => {
-    const tempFile = new FileReader();
-
-    return new Promise((res, rej) => {
-        tempFile.onerror = () => {
-            tempFile.abort();
-            rej(new DOMException('We had some troubles to parse your file'));
-        };
-        tempFile.onload = () => {
-            res(tempFile.result);
-        };
-        tempFile.readAsText(file, 'UTF-8');
-    });
-};
-
-const readCSV = async (file) => {
-    try {
-        let data = await readFile(file);
-        data = csvToArray(data);
-        data = JSON.stringify(data);
-        return data;
-    } catch (e) {
-        showError(e.message);
-    }
-};
-
 const createOptionTag = (value) => {
     const option = document.createElement('option');
     option.value = value;
@@ -116,18 +90,37 @@ const getFile = async (url) => {
     }
 };
 
+const getGroups = (data) => {
+    const result = new Set();
+    data.forEach((item) => {
+        const group = item.group;
+        if (!result.has(group)) {
+            result.add(group);
+        }
+    });
+    return result;
+};
+
+const setGroupOptions = (target, groups) => {
+    groups.forEach((group) => {
+        const option = createOptionTag(group);
+        target.appendChild(option);
+    });
+};
+
 const initialize = async (inputs) => {
     const csvFile = await getFile(config.csvURL);
-    let csvData = csvToArray(csvFile);
-    console.log(csvData);
+    const csvData = csvToArray(csvFile);
+    const groups = getGroups(csvData);
+    console.log(groups);
+    setGroupOptions(groups);
 };
 
 window.addEventListener('DOMContentLoaded', () => {
     const form = document.querySelector('#form');
     const inputs = {
         contest: form.querySelector('#contest-id'),
-        teams: form.querySelector('#teams'),
-        csv: form.querySelector('#csv'),
+        groups: form.querySelector('#groups'),
     };
 
     form.onsubmit = (e) => {
