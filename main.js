@@ -106,9 +106,9 @@ const createOptionTag = (value) => {
     return option;
 };
 
-const getCsv = async () => {
+const getFile = async (url) => {
     try {
-        const res = await axios.get(config.csvURL);
+        const res = await axios.get(url);
         return res.data;
     } catch (error) {
         console.log(error);
@@ -117,9 +117,9 @@ const getCsv = async () => {
 };
 
 const initialize = async (inputs) => {
-    console.log(await getCsv());
-    let csvInput = readCSV(config.csvURL);
-    console.log(csvInput);
+    const csvFile = getFile(config.csvURL);
+    let csvData = readCSV(csvFile);
+    console.log(csvData);
 };
 
 window.addEventListener('DOMContentLoaded', () => {
