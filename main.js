@@ -113,7 +113,7 @@ const initialize = async (inputs) => {
     const csvData = csvToArray(csvFile);
     const groups = getGroups(csvData);
     console.log(groups);
-    setGroupOptions(groups);
+    setGroupOptions(inputs.groups, groups);
 };
 
 window.addEventListener('DOMContentLoaded', () => {
