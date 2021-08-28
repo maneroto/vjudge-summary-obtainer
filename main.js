@@ -2,8 +2,8 @@
 const config = {
     csvURL: './res/reto_semestral.csv',
     outputName: (contestId) => `contest-${contestId}.csv`,
-    inputs,
-    data,
+    inputs: {},
+    data: [],
 };
 
 const showError = (errorMsg) => {
