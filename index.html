@@ -16,7 +16,7 @@
         <p>Just fill up the inputs, click the button and that's it</p>
 
         <form method="GET" id="form">
-            <select name="groups-select" id="groups">
+            <select name="groups-select" id="groups" required>
                 <option selected>Select a group</option>
             </select>
             <input
@@ -25,6 +25,7 @@
                 id="contest-id"
                 class="input contest"
                 placeholder="Contest ID"
+                required
             />
             <button class="btn" type="submit">Obtain</button>
         </form>
