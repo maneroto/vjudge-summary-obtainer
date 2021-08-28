@@ -94,7 +94,7 @@ const getGroups = (data) => {
     const result = new Set();
     data.forEach((item) => {
         const group = item.group;
-        if (!result.has(group)) {
+        if (!result.has(group) && group != '') {
             result.add(group);
         }
     });
