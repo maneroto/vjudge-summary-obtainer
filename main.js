@@ -118,7 +118,7 @@ const getFile = async (url) => {
 
 const initialize = async (inputs) => {
     const csvFile = await getFile(config.csvURL);
-    let csvData = await readCSV(csvFile);
+    let csvData = csvToArray(csvFile);
     console.log(csvData);
 };
 
