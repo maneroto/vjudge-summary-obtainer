@@ -116,6 +116,11 @@ const filteredContest = (contestInfo, csvInfo, group) => {
     result = contestInfo.forEach();
 };
 
+const processSubmit = async (contestId, groupId) => {
+    const rawContest = await getContest(contestId);
+    config.contest = deconstructContest(rawContest);
+};
+
 window.addEventListener('DOMContentLoaded', () => {
     const form = document.querySelector('#form');
     config.inputs = {
@@ -125,13 +130,12 @@ window.addEventListener('DOMContentLoaded', () => {
     initialize();
 
     form.onsubmit = (e) => {
-        const contestInput = config.inputs.contest.value;
-        const groupInput = config.inputs.groups.value;
+        const contestId = config.inputs.contest.value;
+        const groupId = config.inputs.groups.value;
 
         e.preventDefault();
-        if (contestInput != '' && groupInput != '') {
-            const rawContest = getContest(contestInput);
-            config.contest = deconstructContest(rawContest);
+        if (contestId != '' && groupId != '') {
+            processSubmit(contestId, groupId);
         } else {
             showError('You must fill the inputs');
         }
