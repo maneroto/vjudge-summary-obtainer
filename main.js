@@ -7,19 +7,6 @@ const config = {
     outputFileName: (contestId) => `contest-${contestId}.csv`,
 };
 
-Element.prototype.notEmpty = function () {
-    if (this.nodeName != 'INPUT') return false;
-    if (this.value == '') return false;
-    return true;
-};
-
-NodeList.prototype.notEmpty = HTMLCollection.prototype.notEmpty = function () {
-    this.forEach((item) => {
-        if (notEmpty(item) == false) return false;
-    });
-    return true;
-};
-
 const showError = (errorMsg, target = document.querySelector('.error')) => {
     const container = document.querySelector(target);
     container.classList.add('active');
@@ -124,18 +111,28 @@ const initialize = async () => {
     setGroupOptions(config.inputs.groups, groups);
 };
 
+const filteredContest = (contestInfo, csvInfo, quantity, group) => {};
+
 window.addEventListener('DOMContentLoaded', () => {
     const form = document.querySelector('#form');
     config.inputs = {
         contest: form.querySelector('#contest-id'),
         groups: form.querySelector('#groups'),
+        quantity: form.querySelector('#problems-quantity'),
     };
     initialize();
 
     form.onsubmit = (e) => {
+        const contestInput = config.inputs.contest.value;
+        const groupInput = config.inputs.groups.value;
+        const quantityInput = parseInt(config.inputs.quantity.value);
+
         e.preventDefault();
-        if (Object.values(config.inputs).notEmpty()) {
-            console.log('not empty');
+        if (contestInput != '' && groupInput != '' && quantityInput > 0) {
+            const rawContest = getContest(contestInput);
+            config.contest = deconstructContest(rawContest);
+        } else {
+            showError('You must fill the inputs');
         }
     };
 });
