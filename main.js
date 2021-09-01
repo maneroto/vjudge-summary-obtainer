@@ -7,7 +7,7 @@ const config = {
     outputFileName: (contestId) => `contest-${contestId}.csv`,
 };
 
-const showError = (errorMsg, target = document.querySelector('.error')) => {
+const showError = (errorMsg, target = '.error') => {
     const container = document.querySelector(target);
     container.classList.add('active');
     container.textContent = errorMsg;
@@ -111,24 +111,25 @@ const initialize = async () => {
     setGroupOptions(config.inputs.groups, groups);
 };
 
-const filteredContest = (contestInfo, csvInfo, quantity, group) => {};
+const filteredContest = (contestInfo, csvInfo, group) => {
+    let result;
+    result = contestInfo.forEach();
+};
 
 window.addEventListener('DOMContentLoaded', () => {
     const form = document.querySelector('#form');
     config.inputs = {
         contest: form.querySelector('#contest-id'),
         groups: form.querySelector('#groups'),
-        quantity: form.querySelector('#problems-quantity'),
     };
     initialize();
 
     form.onsubmit = (e) => {
         const contestInput = config.inputs.contest.value;
         const groupInput = config.inputs.groups.value;
-        const quantityInput = parseInt(config.inputs.quantity.value);
 
         e.preventDefault();
-        if (contestInput != '' && groupInput != '' && quantityInput > 0) {
+        if (contestInput != '' && groupInput != '') {
             const rawContest = getContest(contestInput);
             config.contest = deconstructContest(rawContest);
         } else {
