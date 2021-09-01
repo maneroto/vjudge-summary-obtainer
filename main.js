@@ -1,19 +1,33 @@
-// Config options
+// Configuration variable
 const config = {
     csvURL: './res/reto_semestral.csv',
-    outputName: (contestId) => `contest-${contestId}.csv`,
-    inputs: {},
-    data: [],
+    csvInfo: [], // Used to store the information retrieved from csv file
+    inputs: {}, // Used to store the inputs needed
+    contest: [], // Used to store the constest information retrieved from VJudje
+    outputFileName: (contestId) => `contest-${contestId}.csv`,
 };
 
-const showError = (errorMsg) => {
-    const container = document.querySelector('.error');
+Element.prototype.notEmpty = function () {
+    if (this.nodeName != 'INPUT') return false;
+    if (this.value == '') return false;
+    return true;
+};
+
+NodeList.prototype.notEmpty = HTMLCollection.prototype.notEmpty = function () {
+    this.forEach((item) => {
+        if (notEmpty(item) == false) return false;
+    });
+    return true;
+};
+
+const showError = (errorMsg, target = document.querySelector('.error')) => {
+    const container = document.querySelector(target);
     container.classList.add('active');
     container.textContent = errorMsg;
 };
 
-const hideError = () => {
-    document.querySelector('.error').classList.remove('active');
+const hideError = (target = document.querySelector('.error')) => {
+    document.querySelector(target).classList.remove('active');
 };
 
 const getContest = async (contestId) => {
@@ -85,9 +99,9 @@ const getFile = async (url) => {
     }
 };
 
-const getGroups = (data) => {
+const getGroups = (inputData) => {
     const result = new Set();
-    data.forEach((item) => {
+    inputData.forEach((item) => {
         const group = item.group;
         if (!result.has(group) && group != '') {
             result.add(group);
@@ -105,8 +119,8 @@ const setGroupOptions = (target, groups) => {
 
 const initialize = async () => {
     const csvFile = await getFile(config.csvURL);
-    config.data = csvToArray(csvFile);
-    const groups = getGroups(config.data);
+    config.csvInfo = csvToArray(csvFile);
+    const groups = getGroups(config.csvInfo);
     setGroupOptions(config.inputs.groups, groups);
 };
 
@@ -116,10 +130,12 @@ window.addEventListener('DOMContentLoaded', () => {
         contest: form.querySelector('#contest-id'),
         groups: form.querySelector('#groups'),
     };
+    initialize();
 
     form.onsubmit = (e) => {
         e.preventDefault();
+        if (Object.values(config.inputs).notEmpty()) {
+            console.log('not empty');
+        }
     };
-
-    initialize();
 });
