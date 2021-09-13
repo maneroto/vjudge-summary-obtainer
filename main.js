@@ -179,7 +179,7 @@ const processSubmit = async (contestId, groupId) => {
     );
     const htmlTable = exportToHTML(filteredContest);
     const container = document.querySelector('.data-container');
-    container.firstChild.remove();
+    container.innerHTML = '';
     container.appendChild(htmlTable);
     const csvTable = exportToCSV(htmlTable);
     downloadCSV(
