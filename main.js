@@ -4,7 +4,14 @@ const config = {
     csvInfo: [], // Used to store the information retrieved from csv file
     inputs: {}, // Used to store the inputs needed
     contest: [], // Used to store the constest information retrieved from VJudje
-    outputFileName: (contestId) => `contest-${contestId}.csv`,
+    outputFileName: 'myContest',
+};
+
+const newTag = (tagName, target, textContent = undefined) => {
+    const tag = document.createElement(tagName);
+    if (textContent != undefined) tag.textContent = textContent;
+    target.appendChild(tag);
+    return tag;
 };
 
 const showError = (errorMsg, target = '.error') => {
@@ -13,7 +20,7 @@ const showError = (errorMsg, target = '.error') => {
     container.textContent = errorMsg;
 };
 
-const hideError = (target = document.querySelector('.error')) => {
+const hideError = (target = '.error') => {
     document.querySelector(target).classList.remove('active');
 };
 
@@ -29,26 +36,26 @@ const getContest = async (contestId) => {
     }
 };
 
-const deconstructContest = (info) => {
+const deconstructContest = (contestInfo) => {
+    const result = [];
     try {
-        const { participants, submissions } = info;
+        const { participants, submissions } = contestInfo;
 
-        submissions.forEach((item) => {
-            if (participants[item[0]].submitted == undefined) {
-                participants[item[0]].submitted = [item.slice(1)];
-            } else {
-                participants[item[0]].submitted.push(item.slice(1));
+        submissions.forEach((submission) => {
+            const current = participants[submission[0]];
+            if (result[current[0]] == undefined) {
+                result[current[0]] = {
+                    submissions: [],
+                    accepted: [],
+                    contestGroup: current[1],
+                };
             }
-
-            if (item[2] == 1) {
-                if (participants[item[0]].accepted == undefined) {
-                    participants[item[0]].accepted = [item[1] + 1];
-                } else {
-                    participants[item[0]].accepted.push(item[1] + 1);
-                }
+            result[current[0]].submissions.push(submission.slice(1));
+            if (submission[2] == 1) {
+                result[current[0]].accepted.push(submission[1] + 1);
             }
         });
-        return participants;
+        return result;
     } catch (error) {
         console.log(error);
         showError('We had some troubles while executing the request');
@@ -67,13 +74,6 @@ const csvToArray = (data, delimiter = ',') => {
         return element;
     });
     return arr;
-};
-
-const createOptionTag = (value) => {
-    const option = document.createElement('option');
-    option.value = value;
-    option.textContent = value;
-    return option;
 };
 
 const getFile = async (url) => {
@@ -99,8 +99,8 @@ const getGroups = (inputData) => {
 
 const setGroupOptions = (target, groups) => {
     groups.forEach((group) => {
-        const option = createOptionTag(group);
-        target.appendChild(option);
+        const option = newTag('option', target, group);
+        option.value = group;
     });
 };
 
@@ -111,14 +111,81 @@ const initialize = async () => {
     setGroupOptions(config.inputs.groups, groups);
 };
 
-const filteredContest = (contestInfo, csvInfo, group) => {
-    let result;
-    result = contestInfo.forEach();
+const filterContest = (contestInfo, csvInfo, group) => {
+    const result = [];
+    const byGroup = csvInfo.filter((entry) => entry.group == group);
+    byGroup.forEach((person) => {
+        if (result[person.vjudge_id] == undefined) {
+            result[person.vjudge_id] = {
+                studentId: person.student_id,
+                submissions: null,
+                accepted: null,
+                contestGroup: '',
+            };
+        }
+        if (contestInfo[person.vjudge_id] != undefined) {
+            const { submissions, accepted, contestGroup } =
+                contestInfo[person.vjudge_id];
+            Object.assign(result[person.vjudge_id], {
+                submissions,
+                accepted,
+                contestGroup,
+            });
+        }
+    });
+    return result;
+};
+
+const exportToHTML = (info) => {
+    const table = document.createElement('table');
+    Object.entries(info).forEach((item) => {
+        const newRow = newTag('tr', table);
+        newTag('td', newRow, item[0]);
+        Object.values(item[1]).forEach((property) =>
+            newTag('td', newRow, property)
+        );
+    });
+    return table;
+};
+
+const exportToCSV = (data) => {
+    let csv = [];
+    let rows = data.querySelectorAll('table tr');
+
+    rows.forEach((row) => {
+        let cols = row.querySelectorAll('td, th');
+        cols = [...cols].map((col) => col.innerHTML);
+        csv.push(cols.join(','));
+    });
+    return csv.join('\n');
+};
+
+const downloadCSV = (csv, filename) => {
+    let file = new Blob([csv], { type: 'text/csv' });
+    let link = document.createElement('a');
+
+    link.download = filename;
+    link.href = window.URL.createObjectURL(file);
+    link.click();
 };
 
 const processSubmit = async (contestId, groupId) => {
     const rawContest = await getContest(contestId);
     config.contest = deconstructContest(rawContest);
+    const filteredContest = filterContest(
+        config.contest,
+        config.csvInfo,
+        groupId
+    );
+    const htmlTable = exportToHTML(filteredContest);
+    const container = document.querySelector('.data-container');
+    container.firstChild.remove();
+    container.appendChild(htmlTable);
+    const csvTable = exportToCSV(htmlTable);
+    downloadCSV(
+        csvTable,
+        `${config.outputFileName || `${contestId}-${groupId}`}.csv`
+    );
 };
 
 window.addEventListener('DOMContentLoaded', () => {
