@@ -118,9 +118,9 @@ const filterContest = (contestInfo, csvInfo, group) => {
         if (result[person.vjudge_id] == undefined) {
             result[person.vjudge_id] = {
                 studentId: person.student_id,
-                submissions: null,
-                accepted: null,
-                contestGroup: '',
+                submissions: 'Empty',
+                accepted: 'Empty',
+                contestGroup: 'Empty',
             };
         }
         if (contestInfo[person.vjudge_id] != undefined) {
